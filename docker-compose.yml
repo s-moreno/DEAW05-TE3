@@ -1,0 +1,69 @@
+services:
+  mariadb:
+    container_name: mariadb
+    image: mariadb:10.5
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: deaw05
+      MARIADB_DATABASE: inventario
+    volumes:
+      - .bbdd:/var/lib/mysql
+      - .initdb:/docker-entrypoint-initdb.d
+    networks:
+      - backend
+
+  adminer:
+    container_name: adminer
+    image: adminer:latest
+    restart: always
+    environment:
+      - ADMINER_DEFAULT_SERVER=mariadb
+      - ADMINER_DEFAULT_DB_USER=root
+      - ADMINER_DEFAULT_DB_NAME=inventario
+    ports:
+      - 8000:8080
+    volumes:
+      - type: bind
+        source: .adminer/adminer.css
+        target: /var/www/html/adminer.css
+    depends_on:
+      - mariadb
+    networks:
+      - frontend
+      - backend
+
+  backend-app:
+    container_name: backend-app
+    restart: always
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    environment:
+      - PORT=8080
+      - DATABASE_URL=jdbc:mariadb://mariadb:3306/inventario
+      - DATABASE_USER=root
+      - DATABASE_PASSWORD=deaw05
+      - CORS_ALLOWED_ORIGINS=http://frontend-app
+    depends_on:
+      - mariadb
+    networks:
+      - backend
+
+  frontend-app:
+    container_name: frontend-app
+    image: httpd:2.4
+    restart: always
+    ports:
+      - 80:80
+    volumes:
+      - ./frontend/htdocs:/usr/local/apache2/htdocs/
+      - ./frontend/conf/httpd.conf:/usr/local/apache2/conf/httpd.conf
+    networks:
+      - frontend
+      - backend
+
+networks:
+  frontend:
+  backend:

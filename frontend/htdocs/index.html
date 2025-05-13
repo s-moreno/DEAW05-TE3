@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestor de Inventario</title>
+  <link rel="stylesheet" href="css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+
+  <link rel="apple-touch-icon" sizes="180x180" href="img/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="img/favicon-16x16.png" />
+  <link rel="manifest" href="img/site.webmanifest" />
+  <link rel="shortcut icon" href="img/favicon.ico" />
+</head>
+
+<body>
+  <!-- Navegación -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+      <a href="/" class="navbar-brand">📦 GESTOR DE INVENTARIO</a>
+
+      <!-- Botón hamburguesa para móviles -->
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <div class="ms-auto">
+          <button id="btnProducts" class="btn btn-outline-light me-2">
+            Productos
+          </button>
+          <button id="btnCategories" class="btn btn-outline-light me-2">
+            Categorías
+          </button>
+          <button id="btnInfo" class="btn btn-outline-light me-2">
+            Info
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Sección Categorías -->
+  <div id="categoriesSection" class="section container margin-top">
+    <h2>Categorías</h2>
+    <div class="text-end mb-3">
+      <button id="btnCategoryModal" class="btn btn-primary">
+        Nueva Categoría
+      </button>
+    </div>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Descripción</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="categoriesTable"></tbody>
+    </table>
+  </div>
+
+  <!-- Sección Productos -->
+  <div id="productsSection" class="section active container margin-top">
+    <h2>Productos</h2>
+
+    <div class="text-end mb-3">
+      <button id="btnProductModal" class="btn btn-primary">
+        Nuevo Producto
+      </button>
+    </div>
+    <div class="form-check mb-3">
+      <input class="form-check-input" type="checkbox" id="lowStockCheck" />
+      <label class="form-check-label" for="lowStockCheck">Mostrar productos bajo stock</label>
+    </div>
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Stock</th>
+          <th>Stock Mínimo</th>
+          <th>Categoría</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="productsTable"></tbody>
+    </table>
+  </div>
+
+  <!-- Modal Categoría -->
+  <div class="modal fade" id="categoryModal" tabindex="-1">
+    <div class="modal-dialog">
+      <form class="modal-content" id="categoryForm">
+        <div class="modal-header">
+          <h5 class="modal-title">Categoría</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Nombre</label>
+            <input type="text" class="form-control" id="categoryName" required />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Descripción</label>
+            <input type="text" class="form-control" id="categoryDescription" />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn-primary">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Producto -->
+  <div class="modal fade" id="productModal" tabindex="-1">
+    <div class="modal-dialog">
+      <form class="modal-content" id="productForm">
+        <div class="modal-header">
+          <h5 class="modal-title">Producto</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Nombre</label>
+            <input type="text" class="form-control" id="productName" required />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Stock</label>
+            <input type="number" class="form-control" id="stock" required />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Stock Mínimo</label>
+            <input type="number" class="form-control" id="stockMin" required />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Categoría</label>
+            <select class="form-select" id="productCategoryId" required>
+              <option value=""></option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn-primary">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal para borrar un Producto/Categoría -->
+  <div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content p-4">
+        <h5>¿Está seguro de que desea eliminarlo?</h5>
+        <div class="d-flex justify-content-end gap-2 mt-3">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            Cancelar
+          </button>
+          <button type="button" class="btn btn-danger" id="confirmDelete">
+            Eliminar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para mostrar información -->
+  <div class="modal fade" id="infoModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content p-4">
+        <div class="modal-header">
+          <h5 class="modal-title">Información</h5>
+        </div>
+        <div class="modal-body">
+          <h4 class="text-center text-decoration-underline mb-3">Gestor de Inventario</h4>
+          <p>Desarrollado por Sergio Moreno (<a href="mailto:smoreno@birt.eus">smoreno@birt.eus</a>), usando
+            JavaScript, HTML y CSS</p>
+          <p>Aplicación que consume una API creada Spring Boot.</p>
+          <p>Curso 2024-2025 en <a href="https://www.birt.eus/ciclo-formativo/desarrollo-de-aplicaciones-web/"
+              target="_blank">Desarrollo de aplicaciones web (BIRTLH)</a>.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/boostrajp.bundle.min.js"></script>
+    <script type="module" src="js/app.js"></script>
+</body>
+
+</html>

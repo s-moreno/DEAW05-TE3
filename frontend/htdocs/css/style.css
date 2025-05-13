@@ -1,0 +1,18 @@
+/* Oculta secciones no activas */
+.section {
+  display: none;
+}
+
+.active {
+  display: block;
+}
+
+/* Resalta productos con stock bajo */
+.low-stock {
+  background-color: #ffe6e6;
+}
+
+/* Espaciado superior */
+.margin-top {
+  margin-top: 20px;
+}
