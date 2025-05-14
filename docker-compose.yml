@@ -7,7 +7,7 @@ services:
       MARIADB_ROOT_PASSWORD: deaw05
       MARIADB_DATABASE: inventario
     volumes:
-      - .bbdd:/var/lib/mysql
+      - ./bbdd:/var/lib/mysql
       - .initdb:/docker-entrypoint-initdb.d
     networks:
       - backend
@@ -18,14 +18,9 @@ services:
     restart: always
     environment:
       - ADMINER_DEFAULT_SERVER=mariadb
-      - ADMINER_DEFAULT_DB_USER=root
-      - ADMINER_DEFAULT_DB_NAME=inventario
+      - ADMINER_DESIGN=lucas-sandery
     ports:
       - 8000:8080
-    volumes:
-      - type: bind
-        source: .adminer/adminer.css
-        target: /var/www/html/adminer.css
     depends_on:
       - mariadb
     networks:
