@@ -11,7 +11,7 @@ public class WebConfig implements WebMvcConfigurer {
 	@Override
 	public void addCorsMappings(@NonNull CorsRegistry registry) {
 		// Configura CORS globalmente para todas las rutas
-		registry.addMapping("/**").allowedOrigins("*") // Especifica tu dominio aquí
+		registry.addMapping("/**").allowedOrigins("*")
 				.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS").allowedHeaders("*").allowCredentials(false);
 	}
 }
