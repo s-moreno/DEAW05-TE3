@@ -7,7 +7,7 @@ services:
       MARIADB_ROOT_PASSWORD: deaw05
       MARIADB_DATABASE: inventario
     volumes:
-      - ./bbdd:/var/lib/mysql
+      - dbdata:/var/lib/mysql
       - .initdb:/docker-entrypoint-initdb.d
     networks:
       - backend
@@ -56,6 +56,9 @@ services:
     networks:
       - frontend
       - backend
+
+volumes:
+  dbdata:
 
 networks:
   frontend:
