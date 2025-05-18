@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import birt.smoreno.inventarioAPI.entities.ProductEntity;
@@ -47,4 +48,20 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
 	 */
 	@Query(value = "SELECT p FROM ProductEntity p WHERE p.currentStock < p.minStock")
 	List<ProductEntity> findProductUnderStock();
+
+	/**
+	 * Consulta personalizada para contar el número de productos asociados a una
+	 * categoría específica.
+	 * <p>
+	 * Esta consulta utiliza JPQL para contar el número de productos en la entidad
+	 * {@link ProductEntity} que pertenecen a una categoría dada, identificada por
+	 * su ID.
+	 * </p>
+	 * 
+	 * @param categoryId ID de la categoría para la cual se desea contar los
+	 *                   productos.
+	 * @return Número de productos asociados a la categoría especificada.
+	 */
+	@Query("SELECT COUNT(p) FROM ProductEntity p WHERE p.category.id = :categoryId")
+	int countByCategoryId(@Param("categoryId") int categoryId);
 }

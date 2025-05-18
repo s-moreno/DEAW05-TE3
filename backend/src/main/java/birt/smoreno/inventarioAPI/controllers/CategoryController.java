@@ -143,17 +143,26 @@ public class CategoryController {
 	 */
 	@DeleteMapping("/{id}")
 	public ResponseEntity<ApiResponseDTO<CategoryResponseDTO>> deleteCategory(@PathVariable int id) {
-		// Eliminar la categoría por su ID
-		Optional<CategoryResponseDTO> deletedCategory = categoryService.deleteCategory(id);
 
-		if (deletedCategory.isPresent()) {
-			// Devolver la categoría eliminada con el estado 200 (OK)
-			return ResponseEntity.ok(new ApiResponseDTO<>(AppConstants.STATUS_SUCCESS, HttpStatus.OK.value(),
-					"Categoría eliminada correctamente", deletedCategory.get()));
-		} else {
-			// Devolver un estado 404 (NOT FOUND) si no se encuentra la categoría
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponseDTO<>(AppConstants.STATUS_ERROR,
-					HttpStatus.NOT_FOUND.value(), "Categoría no encontrada", null));
+		try {
+			// Eliminar la categoría por su ID
+			Optional<CategoryResponseDTO> deletedCategory = categoryService.deleteCategory(id);
+
+			if (deletedCategory.isPresent()) {
+				// Devolver la categoría eliminada con el estado 200 (OK)
+				return ResponseEntity.ok(new ApiResponseDTO<>(AppConstants.STATUS_SUCCESS, HttpStatus.OK.value(),
+						"Categoría eliminada correctamente", deletedCategory.get()));
+			} else {
+				// Devolver un estado 404 (NOT FOUND) si no se encuentra la categoría
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponseDTO<>(AppConstants.STATUS_ERROR,
+						HttpStatus.NOT_FOUND.value(), "Categoría no encontrada", null));
+			}
+
+		} catch (IllegalStateException e) {
+			// Manejo del caso: la categoría tiene productos asociados
+			return ResponseEntity.status(HttpStatus.CONFLICT).body(
+					new ApiResponseDTO<>(AppConstants.STATUS_ERROR, HttpStatus.CONFLICT.value(), e.getMessage(), null));
 		}
+
 	}
 }

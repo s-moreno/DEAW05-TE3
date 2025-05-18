@@ -9,6 +9,7 @@ import birt.smoreno.inventarioAPI.dto.CategoryResponseDTO;
 import birt.smoreno.inventarioAPI.entities.CategoryEntity;
 import birt.smoreno.inventarioAPI.mappers.CategoryMapper;
 import birt.smoreno.inventarioAPI.repositories.CategoryRepository;
+import birt.smoreno.inventarioAPI.repositories.ProductRepository;
 
 /**
  * {@code CategoryService} es una clase de servicio que gestiona la lógica de
@@ -37,8 +38,14 @@ import birt.smoreno.inventarioAPI.repositories.CategoryRepository;
 @Service
 public class CategoryService {
 
-	// Instanciar el repositorio de categorías para ser utilizado en los métodos de la clase
+	// Instanciar el repositorio de categorías para ser utilizado en los métodos de
+	// la clase
 	private final CategoryRepository categoryRepository;
+
+	// Instanciar el repositorio de productos para ser utilizado en los métodos de
+	// la clase
+	private final ProductRepository productRepository;
+
 	// Instanciar el mapper para convertir entre entidades y DTOs
 	private final CategoryMapper categoryMapper;
 
@@ -48,10 +55,12 @@ public class CategoryService {
 	 * 
 	 * @param categoryRepository Repositorio de categorías
 	 * 
-	 * @param categoryMapper      Mapper para convertir entre entidades y DTOs
+	 * @param categoryMapper     Mapper para convertir entre entidades y DTOs
 	 */
-	public CategoryService(CategoryRepository categoryRepository, CategoryMapper categoryMapper) {
+	public CategoryService(CategoryRepository categoryRepository, ProductRepository productRespository,
+			CategoryMapper categoryMapper) {
 		this.categoryRepository = categoryRepository;
+		this.productRepository = productRespository;
 		this.categoryMapper = categoryMapper;
 	}
 
@@ -122,6 +131,12 @@ public class CategoryService {
 		if (deletedCategory.isEmpty()) {
 			return Optional.empty();
 		}
+
+		int productCount = productRepository.countByCategoryId(id);
+		if (productCount > 0) {
+			throw new IllegalStateException("No se puede eliminar la categoría porque tiene productos asociados.");
+		}
+
 		categoryRepository.deleteById(id);
 		return Optional.of(categoryMapper.toResponseDTO(deletedCategory.get()));
 	}
