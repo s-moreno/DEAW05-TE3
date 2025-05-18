@@ -166,13 +166,22 @@ export async function cargarCategorias() {
 // Evento de envío del formulario de producto
 document.getElementById("productForm").addEventListener("submit", async (e) => {
   e.preventDefault();
+
   const nombre = document.getElementById("productName").value.trim();
   const stockActual = document.getElementById("stock").value.trim();
   const stockMinimo = document.getElementById("stockMin").value.trim();
   const idCategoria = document.getElementById("productCategoryId").value.trim();
 
-  if (!nombre || !stockActual || !stockMinimo || !idCategoria) {
-    alert("Por favor, completa todos los campos.");
+  // Función para mostrar modal de error
+  const showErrorModal = (mensaje) => {
+    document.getElementById("errorMessage").textContent = mensaje;
+    const errorModal = new bootstrap.Modal(document.getElementById("errorModal"));
+    errorModal.show();
+  };
+
+  // Validación básica
+  if (!nombre || isNaN(stockActual) || isNaN(stockMinimo) || isNaN(idCategoria)) {
+    showErrorModal("Por favor, completa todos los campos.");
     return;
   }
 
@@ -197,11 +206,17 @@ document.getElementById("productForm").addEventListener("submit", async (e) => {
       body: JSON.stringify(payload),
     });
 
-    if (!res.ok) throw new Error("Error al guardar el producto");
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.message || "Error al guardar el producto");
+    }
+
+
     bootstrap.Modal.getInstance(document.getElementById("productModal")).hide();
     loadProducts();
+  
   } catch (err) {
     console.error(err);
-    alert("Error al guardar el producto");
+    showErrorModal(err.message || "Error al guardar el producto");
   }
 });

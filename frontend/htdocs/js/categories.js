@@ -93,13 +93,25 @@ async function deleteCategory(id) {
         method: "DELETE",
       });
 
-      if (!res.ok) throw new Error("Error al eliminar la categoría");
+      if (!res.ok) {
+        // Intentamos obtener el mensaje de error del servidor
+        // y lo lanzamos como excepción
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Error al eliminar la categoría");
+      }
 
       modal.hide();
       loadCategories();
     } catch (err) {
+
       console.error(err);
-      alert("No se pudo eliminar la categoría");
+      modal.hide();
+
+      // Mostramos el mensaje de error al usuario
+      const errorModalElement = document.getElementById("errorModal");
+      const errorModal = new bootstrap.Modal(errorModalElement);
+      document.getElementById("errorMessage").textContent = err.message;
+      errorModal.show();
     }
   });
 }
