@@ -165,25 +165,22 @@ export async function cargarCategorias() {
 
 // Evento de envío del formulario de producto
 document.getElementById("productForm").addEventListener("submit", async (e) => {
+  
+  // Evitar el comportamiento por defecto del formulario
   e.preventDefault();
 
+  // Obtención y limpieza de campos del formulario
   const nombre = document.getElementById("productName").value.trim();
   const stockActual = document.getElementById("stock").value.trim();
   const stockMinimo = document.getElementById("stockMin").value.trim();
   const idCategoria = document.getElementById("productCategoryId").value.trim();
 
   // Función para mostrar modal de error
-  const showErrorModal = (mensaje) => {
-    document.getElementById("errorMessage").textContent = mensaje;
+  const showErrorModal = (mensaje,) => {
+    document.getElementById("errorMessage").innerHTML = mensaje;
     const errorModal = new bootstrap.Modal(document.getElementById("errorModal"));
     errorModal.show();
   };
-
-  // Validación básica
-  if (!nombre || isNaN(stockActual) || isNaN(stockMinimo) || isNaN(idCategoria)) {
-    showErrorModal("Por favor, completa todos los campos.");
-    return;
-  }
 
   const payload = {
     nombre,
@@ -192,12 +189,14 @@ document.getElementById("productForm").addEventListener("submit", async (e) => {
     id_categoria: Number(idCategoria),
   };
 
+  // Comprobar si si el metodo es PUT o POST
   const url = editingProductId
     ? `${API_BASE_PRODUCTS}/${editingProductId}`
     : API_BASE_PRODUCTS;
   const method = editingProductId ? "PUT" : "POST";
 
   try {
+    // Enviar el payload a la API en función del método (POST o PUT)
     const res = await fetch(url, {
       method,
       headers: {
@@ -206,17 +205,31 @@ document.getElementById("productForm").addEventListener("submit", async (e) => {
       body: JSON.stringify(payload),
     });
 
+    // Comprobar si la respuesta es correcta y si no, mostrar el error
     if (!res.ok) {
       const errorData = await res.json();
-      throw new Error(errorData.message || "Error al guardar el producto");
+
+      const mensajeError = errorData.message || "Error al guardar el producto";
+      const detallesError = errorData.data || null;
+
+      if (detallesError && typeof detallesError === 'object') {
+        const detallesErrorHtml = Object.entries(detallesError)
+          .map(([key, value]) => `<li><strong>${key}</strong>: ${value}</li>`)
+          .join("");
+
+        showErrorModal(`${mensajeError}<ul>${detallesErrorHtml}</ul>`);
+        return;
+      }
     }
 
-
+    // Ocutar el modal de creación/edición de producto
     bootstrap.Modal.getInstance(document.getElementById("productModal")).hide();
+    
+    // cargar productos desde la API
     loadProducts();
   
   } catch (err) {
     console.error(err);
-    showErrorModal(err.message || "Error al guardar el producto");
+    showErrorModal(err.message);
   }
 });
